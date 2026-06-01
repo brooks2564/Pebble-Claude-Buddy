@@ -21,8 +21,8 @@ var POLL_INTERVAL = 1500;
 
 // ── Ready ─────────────────────────────────────────────────────────────────
 Pebble.addEventListener('ready', function() {
-  serverUrl = localStorage.getItem('server_url') || '';
-  if (serverUrl) startPolling();
+  serverUrl = localStorage.getItem('server_url') || 'https://appraiser-aviation-polka.ngrok-free.dev';
+  startPolling();
 });
 
 // ── Polling ───────────────────────────────────────────────────────────────
