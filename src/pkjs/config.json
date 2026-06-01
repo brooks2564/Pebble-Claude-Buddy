@@ -1,0 +1,30 @@
+[
+  {
+    "type": "heading",
+    "defaultValue": "Claude Buddy"
+  },
+  {
+    "type": "section",
+    "items": [
+      {
+        "type": "heading",
+        "defaultValue": "Server",
+        "size": 4
+      },
+      {
+        "type": "input",
+        "messageKey": "SERVER_URL",
+        "label": "Server URL",
+        "description": "Address of your computer running server.js — find your IP with: hostname -I",
+        "defaultValue": "",
+        "attributes": {
+          "placeholder": "http://192.168.0.x:9876"
+        }
+      }
+    ]
+  },
+  {
+    "type": "submit",
+    "defaultValue": "Save"
+  }
+]

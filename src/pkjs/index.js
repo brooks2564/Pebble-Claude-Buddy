@@ -1,6 +1,7 @@
 // Claude Buddy — PebbleKit JS
-// Polls the local HTTP server on the computer and relays state to the watch.
-// Server default: http://<computer-ip>:9876
+var Clay = require('pebble-clay');
+var clayConfig = require('./config.json');
+var clay = new Clay(clayConfig, null, { autoHandleEvents: false });
 
 var KEY_STATUS     = 'STATUS';
 var KEY_TOOL_NAME  = 'TOOL_NAME';
@@ -12,28 +13,23 @@ var STATUS_IDLE     = 0;
 var STATUS_THINKING = 1;
 var STATUS_WAITING  = 2;
 
-var serverUrl   = '';
-var pollTimer   = null;
-var lastStatus  = -1;
-var animFrame   = 0;
-var POLL_INTERVAL = 1500; // ms
+var serverUrl     = '';
+var pollTimer     = null;
+var lastStatus    = -1;
+var animFrame     = 0;
+var POLL_INTERVAL = 1500;
 
-// ── Settings ──────────────────────────────────────────────────────────────
+// ── Ready ─────────────────────────────────────────────────────────────────
 Pebble.addEventListener('ready', function() {
-  var stored = localStorage.getItem('server_url');
-  serverUrl = stored || '';
-  if (!serverUrl) {
-    console.log('Claude Buddy: no server URL configured');
-    return;
-  }
-  startPolling();
+  serverUrl = localStorage.getItem('server_url') || '';
+  if (serverUrl) startPolling();
 });
 
 // ── Polling ───────────────────────────────────────────────────────────────
 function startPolling() {
-  if (pollTimer) { clearInterval(pollTimer); }
+  if (pollTimer) clearInterval(pollTimer);
   pollTimer = setInterval(poll, POLL_INTERVAL);
-  poll(); // immediate first fetch
+  poll();
 }
 
 function poll() {
@@ -43,15 +39,10 @@ function poll() {
   xhr.timeout = 1000;
   xhr.onload = function() {
     if (xhr.status !== 200) return;
-    try {
-      var data = JSON.parse(xhr.responseText);
-      handleServerState(data);
-    } catch (e) {
-      console.log('Claude Buddy: bad JSON from server');
-    }
+    try { handleServerState(JSON.parse(xhr.responseText)); }
+    catch (e) {}
   };
   xhr.onerror = xhr.ontimeout = function() {
-    // Server unreachable — show idle so watch doesn't get stuck
     if (lastStatus !== STATUS_IDLE) {
       sendToWatch({ STATUS: STATUS_IDLE });
       lastStatus = STATUS_IDLE;
@@ -61,7 +52,6 @@ function poll() {
 }
 
 function handleServerState(data) {
-  // data: { status: 'idle'|'thinking'|'waiting', tool: '', input: '' }
   var statusMap = { idle: STATUS_IDLE, thinking: STATUS_THINKING, waiting: STATUS_WAITING };
   var status = (statusMap[data.status] !== undefined) ? statusMap[data.status] : STATUS_IDLE;
 
@@ -78,7 +68,6 @@ function handleServerState(data) {
     msg[KEY_TOOL_INPUT] = (data.input || '').substring(0, 60);
   }
 
-  // Only send if something changed (avoid spamming AppMessage)
   if (status !== lastStatus || status === STATUS_THINKING) {
     sendToWatch(msg);
     lastStatus = status;
@@ -87,12 +76,12 @@ function handleServerState(data) {
 
 function sendToWatch(msg) {
   Pebble.sendAppMessage(msg,
-    function() { /* ok */ },
+    function() {},
     function(e) { console.log('Claude Buddy: sendAppMessage failed: ' + e.error.message); }
   );
 }
 
-// ── Responses from watch (0=deny, 1=allow, 2=allow always) ───────────────
+// ── Watch → server (approve / deny) ──────────────────────────────────────
 Pebble.addEventListener('appmessage', function(e) {
   var response = e.payload[KEY_RESPONSE];
   if (response === undefined || !serverUrl) return;
@@ -102,21 +91,18 @@ Pebble.addEventListener('appmessage', function(e) {
   xhr.send(JSON.stringify({ response: response }));
 });
 
-// ── Config page (set server URL) ──────────────────────────────────────────
+// ── Clay config page ──────────────────────────────────────────────────────
 Pebble.addEventListener('showConfiguration', function() {
-  var current = localStorage.getItem('server_url') || '';
-  var base = 'https://brooks2564.github.io/Pebble-Claude-Buddy/config.html';
-  Pebble.openURL(base + '#url=' + encodeURIComponent(current));
+  Pebble.openURL(clay.generateUrl());
 });
 
 Pebble.addEventListener('webviewclosed', function(e) {
   if (!e.response) return;
-  try {
-    var data = JSON.parse(decodeURIComponent(e.response));
-    if (data.url) {
-      localStorage.setItem('server_url', data.url);
-      serverUrl = data.url;
-      startPolling();
-    }
-  } catch (err) {}
+  var settings = clay.getSettings(e.response);
+  var url = settings.SERVER_URL ? settings.SERVER_URL.value : '';
+  if (url) {
+    localStorage.setItem('server_url', url);
+    serverUrl = url;
+    startPolling();
+  }
 });
