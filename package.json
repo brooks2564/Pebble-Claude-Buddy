@@ -1,0 +1,40 @@
+{
+  "name": "pebble-claude-buddy",
+  "author": "Brooman Inks",
+  "version": "1.0.0",
+  "keywords": [
+    "pebble-app"
+  ],
+  "private": true,
+  "pebble": {
+    "displayName": "Claude Buddy",
+    "shortName": "Claude",
+    "longName": "Claude Buddy",
+    "uuid": "c1a2de30-b7f4-4e8a-9c12-0f5a6b7d8e9a",
+    "sdkVersion": "3",
+    "enableMultiJS": true,
+    "targetPlatforms": [
+      "aplite",
+      "basalt",
+      "chalk",
+      "diorite",
+      "emery",
+      "flint",
+      "gabbro"
+    ],
+    "watchapp": {
+      "watchface": false
+    },
+    "capabilities": [],
+    "messageKeys": {
+      "STATUS":     0,
+      "TOOL_NAME":  1,
+      "TOOL_INPUT": 2,
+      "RESPONSE":   3,
+      "ANIM_FRAME": 4
+    },
+    "resources": {
+      "media": []
+    }
+  }
+}
