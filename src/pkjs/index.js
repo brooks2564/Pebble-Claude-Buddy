@@ -104,20 +104,9 @@ Pebble.addEventListener('appmessage', function(e) {
 
 // ── Config page (set server URL) ──────────────────────────────────────────
 Pebble.addEventListener('showConfiguration', function() {
-  var current = localStorage.getItem('server_url') || 'http://192.168.0.x:9876';
-  Pebble.openURL('data:text/html,' + encodeURIComponent(
-    '<html><body style="font-family:sans-serif;padding:20px">' +
-    '<h2>Claude Buddy</h2>' +
-    '<p>Server URL (computer running server.js):</p>' +
-    '<input id="url" type="text" style="width:100%;font-size:16px;padding:6px" value="' + current + '">' +
-    '<br><br>' +
-    '<button onclick="save()" style="font-size:16px;padding:8px 20px">Save</button>' +
-    '<script>function save(){' +
-    'var u=document.getElementById("url").value;' +
-    'location.href="pebblejs://close#"+encodeURIComponent(JSON.stringify({url:u}));' +
-    '}<\/script>' +
-    '</body></html>'
-  ));
+  var current = localStorage.getItem('server_url') || '';
+  var base = 'https://brooks2564.github.io/Pebble-Claude-Buddy/config.html';
+  Pebble.openURL(base + '#url=' + encodeURIComponent(current));
 });
 
 Pebble.addEventListener('webviewclosed', function(e) {
