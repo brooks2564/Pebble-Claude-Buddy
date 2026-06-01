@@ -100,6 +100,14 @@ If the server is unreachable (watch off, wrong IP), hooks exit 0 and Claude proc
 
 Supports all 7 Pebble platforms: aplite, basalt, chalk, diorite, emery, flint, gabbro.
 
+## CloudPebble
+
+Import directly into CloudPebble (use [cloudpebble.repebble.com](https://cloudpebble.repebble.com)):
+
+```
+https://cloudpebble.repebble.com/ide/import/github/brooks2564/Pebble-Claude-Buddy
+```
+
 ## Inspired by
 
 [Anthropic's claude-desktop-buddy](https://github.com/anthropics/claude-desktop-buddy) — an open-source ESP32 desk pet that does the same thing with a physical microcontroller.
