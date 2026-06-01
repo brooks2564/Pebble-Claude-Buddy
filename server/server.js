@@ -10,7 +10,8 @@ const http = require('http');
 const fs   = require('fs');
 const path = require('path');
 
-const PORT          = parseInt(process.argv[process.argv.indexOf('--port') + 1] || '9876', 10);
+const portIdx = process.argv.indexOf('--port');
+const PORT    = portIdx !== -1 ? parseInt(process.argv[portIdx + 1], 10) : 9876;
 const ALLOWLIST_PATH = path.join(process.env.HOME, '.claude', 'buddy-allowlist.json');
 const WAIT_TIMEOUT_MS = 60000;
 
